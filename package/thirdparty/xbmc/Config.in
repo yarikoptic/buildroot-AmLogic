@@ -86,3 +86,10 @@ config BR2_PACKAGE_XBMC
 	xbmc
 
 		http://xbmc.org
+
+config BR2_XBMC_REMOTE_CONF
+	string "XBMC Remote Configuration File"
+	default ""
+	help
+	  File to copy to remote.conf in /etc/xbmc directory.
+
