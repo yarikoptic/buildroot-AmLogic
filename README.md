@@ -12,7 +12,7 @@ In a fresh minimal Debian Unstable install,
       automake autoconf  nasm unzip gettext flex bison libsdl-image1.2 \
       liblzo2-2 lzma python openjdk-7-jre-headless \
       texinfo libxml-parser-perl wget pkg-config swig cpio zlib1g-dev \
-      libgmp-dev libmpfr-dev
+      libgmp-dev libmpfr-dev subversion
 ```
 
 Note that as of current (2012-10-10) Debian Unstable, python defaults
@@ -36,7 +36,9 @@ The following devices are supported at this moment;
 
       Refee/OE Smart TV Box == amlogic_f16ref-xbmc_defconfig
 
-      GBox Midnight == amlogic_f16ref-xbmc_defconfig
+      GBox Midnight == amlogic_f16ref_gbox-xbmc_defconfig
+      
+      GBox Midnight v2.0 == amlogic_f16ref_gbox_1-xbmc_defconfig
 
       Sumvision Nano M1 (non slim) == amlogic_stvmc-xbmc_defconfig (Actually the same as the xios M1)
 
