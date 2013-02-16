@@ -46,6 +46,8 @@ The following devices are supported at this moment;
 
       Geniatech/MyGica Enjoy TV 510b == amlogic_stvmc-xbmc_defconfig
 
+
+So run one of the following commands
 ```shell
 % make amlogic_xios-xbmc_defconfig
 ```
