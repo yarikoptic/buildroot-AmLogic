@@ -1,0 +1,113 @@
+#!/bin/sh
+exec 1>/tmp/userdata.txt
+exec 2>>/tmp/userdata.txt
+SCRIPTNAME="S49persona"
+
+if [ "X$1" = "Xstart" ]; then
+  echo $SCRIPTNAME": Begin"
+  if [ -f /tmp/userdata/$SCRIPTNAME ]; then
+    echo $SCRIPTNAME": Found "$SCRIPTNAME" in /tmp/userdata"
+    cp /tmp/userdata/$SCRIPTNAME /tmp
+    /tmp/$SCRIPTNAME start
+    echo $SCRIPTNAME": done"
+    PERSONA=1
+  fi
+  if [ -z $PERSONA ] ; then
+    echo $SCRIPTNAME": Finding USERDATA"
+    if [ -e "/dev/disk/by-label/USERDATA" ]; then
+      USERDATA=1
+      #Get block device of USERDATA
+      USERDATA_DISK="/dev/"`ls -l /dev/disk/by-label | grep 'USERDATA' | cut -d "/" -f 3`
+      echo $SCRIPTNAME": USERDATA found at "$USERDATA_DISK
+    else
+      echo $SCRIPTNAME": USERDATA not found. Sleeping 1 and trying again"
+      for i in $(seq 0 5)
+      do
+        sleep 1
+        if [ -e "/dev/disk/by-label/USERDATA" ]; then
+            USERDATA=1
+            #Get block device of USERDATA
+            USERDATA_DISK="/dev/"`ls -l /dev/disk/by-label | grep 'USERDATA' | cut -d "/" -f 3`
+            echo $SCRIPTNAME": USERDATA found at "$USERDATA_DISK
+            break
+        else
+          USERDATA=0
+          echo $SCRIPTNAME": USERDATA not found. Sleeping 1 and trying again"
+        fi
+      done
+    fi
+    #Check if USERDATA is mounted, if not try to mount it
+    if [ $USERDATA -eq 1 ] ; then
+      echo $SCRIPTNAME": Checking if "$USERDATA_DISK" is mounted"
+      if grep -qs $USERDATA_DISK /proc/mounts ; then
+        USERDATA_MNTPT=`grep $USERDATA_DISK /proc/mounts | cut -d " " -f 2 | grep '/media'`
+        echo $SCRIPTNAME": USERDATA mounted at "$USERDATA_MNTPT
+      else
+        echo $SCRIPTNAME": USERDATA not mounted. Sleeping 1 and trying again"
+        for i in $(seq 0 10)
+        do
+          sleep 1
+          if grep -qs $USERDATA_DISK /proc/mounts ; then
+            USERDATA_MNTPT=`grep $USERDATA_DISK /proc/mounts | cut -d " " -f 2 | grep '/media'`
+            echo $SCRIPTNAME": USERDATA mounted at "$USERDATA_MNTPT
+            break
+          else
+            echo $SCRIPTNAME": USERDATA not mounted. Sleeping 1 and trying again"
+          fi
+        done
+      fi
+    fi
+    if [ ! -z USERDATA_MNTPT ] ; then
+      echo $SCRIPTNAME": Checking for xbmc-data folder"
+      if [ -d $USERDATA_MNTPT/xbmc-data ] ; then
+        USERDATA_XBMC=1
+        echo $SCRIPTNAME": xbcm-data found"
+      else
+        USERDATA_XBMC=0
+  	    mkdir -p $USERDATA_MNTPT/xbmc-data
+        echo $SCRIPTNAME": xbmc-data not found. Folder created"
+      fi
+      #Copy files if needed
+      if [ $USERDATA_XBMC -ne 1 ] ; then
+        echo $SCRIPTNAME": Copying local data to USERDATA"
+        echo $SCRIPTNAME": Mounting USERDATA async"
+        /bin/mount -o remount,rw,async $USERDATA_MNTPT
+        cp -a /tmp/userdata/* $USERDATA_MNTPT/xbmc-data
+        if [ $? -ne 0 ] ; then
+          echo $SCRIPTNAME": Copying Error"
+        else
+          echo $SCRIPTNAME": Data Copied to USERDATA"
+          USERDATA_XBMC=1
+        fi
+        echo $SCRIPTNAME": Syncing data"
+        sync
+        echo $SCRIPTNAME": Remounting sync for data integrity"
+        /bin/mount -o remount,rw,sync $USERDATA_MNTPT
+      fi
+      if [ $USERDATA_XBMC -eq 1 ] ; then
+        echo $SCRIPTNAME": Creating userdata.internal for local data"
+        mkdir -p /tmp/userdata.internal
+        echo $SCRIPTNAME": Binding local data to userdata.internal"
+        /bin/mount -o bind /tmp/userdata /tmp/userdata.internal
+        echo $SCRIPTNAME": Binding USERDATA/xbmc-data to /tmp/userdata"
+        /bin/mount -o bind $USERDATA_MNTPT/xbmc-data /tmp/userdata
+        if [ -d "/tmp/userdata.internal/xios/root/.xbmc/temp" ] ; then
+          echo $SCRIPTNAME": Creating local xbmc temp folder"
+          mkdir -p /tmp/userdata.internal/xios/root/.xbmc/temp
+        fi
+        if [ -d "/tmp/userdata/xios/root/.xbmc/temp" ] ; then
+          echo $SCRIPTNAME": Creating USERDATA xbmc temp folder"
+          mkdir -p /tmp/userdata/xios/root/.xbmc/temp
+        fi
+        # Bind temp on mtd to temp on USERDATA to account for sockets on fstab
+        echo $SCRIPTNAME": Binding local xbmc temp to USERDATA temp"
+        /bin/mount -o bind /tmp/userdata.internal/xios/root/.xbmc/temp /tmp/userdata/xios/root/.xbmc/temp
+        echo $SCRIPTNAME": Binding USERDATA root to /root"
+        /bin/mount -o bind $USERDATA_MNTPT/xbmc-data/xios/root /root
+        echo $SCRIPTNAME": Binding local xbmc temp to /root/.xbmc/temp"
+        /bin/mount -o bind /tmp/userdata.internal/xios/root/.xbmc/temp /root/.xbmc/temp
+      fi
+    fi
+    echo $SCRIPTNAME": done"
+  fi
+fi
