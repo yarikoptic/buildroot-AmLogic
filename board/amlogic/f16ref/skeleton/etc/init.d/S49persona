@@ -34,6 +34,7 @@ if [ "X$1" = "Xstart" ]; then
       USERDATA_DISK="/dev/"`ls -l /dev/disk/by-label | grep 'USERDATA' | cut -d "/" -f 3`
       echo $SCRIPTNAME": Checking if "$USERDATA_DISK" is mounted"
       if grep -qs $USERDATA_DISK /proc/mounts ; then
+        echo $SCRIPTNAME": USERDATA found"
         USERDATA_MNTPT=`grep $USERDATA_DISK /proc/mounts | cut -d " " -f 2 | grep 'media'`
         echo $SCRIPTNAME": USERDATA mounted at "$USERDATA_MNTPT
       else
@@ -53,6 +54,9 @@ if [ "X$1" = "Xstart" ]; then
         echo $SCRIPTNAME": xbmc-data folder not found. Folder created"
       fi
       if [ $USERDATA_XBMC -ne 1 ] ; then
+        if [ -f /usr/share/splash/copying.fb.lzo ] ; then
+          lzopcat /usr/share/splash/copying.fb.lzo > /dev/fb0
+        fi
         echo $SCRIPTNAME": Copying local data to USERDATA"
         echo $SCRIPTNAME": Mounting USERDATA async"
         /bin/mount -o remount,rw,async $USERDATA_MNTPT
