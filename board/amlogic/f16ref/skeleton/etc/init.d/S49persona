@@ -91,6 +91,14 @@ if [ "X$1" = "Xstart" ]; then
         /bin/mount -o bind /tmp/userdata.internal/xios/root/.xbmc/temp /root/.xbmc/temp
       fi
     fi
+    # Safety section, rename S49xbmc-pre if it contains toys4me's script
+    if [ $USERDATA_XBMC -eq 1 ] ; then
+      if grep -qs 'mount -o bind /media/sdcard' /tmp/userdata/xios/root/.xbmc/S94xbmc-pre ; then
+        # Found S94xbmc-pre script that manipulates userdata so rename it
+        echo $SCRIPTNAME": Found potentially dangerous S94xbmc-pre script, renaming it"
+        mv /tmp/userdata/xios/root/.xbmc/S94xbmc-pre /tmp/userdata/xios/root/.xbmc/S94xbmc-pre.disabled
+      fi
+    fi
     echo $SCRIPTNAME": Done"
   fi
-fi      
+fi
