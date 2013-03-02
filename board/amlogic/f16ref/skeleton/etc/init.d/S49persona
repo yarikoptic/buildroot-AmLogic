@@ -122,7 +122,7 @@ if [ "X$1" = "Xstart" ]; then
       echo $SCRIPTNAME": Dropbear DSS key found"
     else
       echo $SCRIPTNAME": Dropbear DSS key not found. Generating DSS key"
-      /usr/bin/dropbearkey -t dss -f /tmp/userdata/dropbear/dropbear_rsa_host_key > /dev/null 2>&1
+      /usr/bin/dropbearkey -t dss -f /tmp/userdata/dropbear/dropbear_dss_host_key > /dev/null 2>&1
     fi
     echo $SCRIPTNAME": Placing keys in /tmp/etc directory"
     cp -f /tmp/userdata/dropbear/dropbear_rsa_host_key /tmp/etc/dropbear/dropbear_rsa_host_key
