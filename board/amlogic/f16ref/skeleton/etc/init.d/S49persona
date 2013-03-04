@@ -1,6 +1,7 @@
 #!/bin/sh
 exec 1>/tmp/userdata.txt
 exec 2>>/tmp/userdata.txt
+
 SCRIPTNAME="S49persona"
 
 if [ "X$1" = "Xstart" ]; then
@@ -14,78 +15,62 @@ if [ "X$1" = "Xstart" ]; then
   fi
   if [ -z $PERSONA ] ; then
     echo $SCRIPTNAME": Finding USERDATA"
-    if [ -e "/dev/disk/by-label/USERDATA" ]; then
-      USERDATA=1
-      #Get block device of USERDATA
-      USERDATA_DISK="/dev/"`ls -l /dev/disk/by-label | grep 'USERDATA' | cut -d "/" -f 3`
-      echo $SCRIPTNAME": USERDATA found at "$USERDATA_DISK
-    else
-      echo $SCRIPTNAME": USERDATA not found. Sleeping 1 and trying again"
-      for i in $(seq 0 5)
+    if [ -e /tmp/userdata/persona_enable_wait ] ; then
+      for i in $(seq 0 9)
       do
-        sleep 1
-        if [ -e "/dev/disk/by-label/USERDATA" ]; then
-            USERDATA=1
-            #Get block device of USERDATA
-            USERDATA_DISK="/dev/"`ls -l /dev/disk/by-label | grep 'USERDATA' | cut -d "/" -f 3`
-            echo $SCRIPTNAME": USERDATA found at "$USERDATA_DISK
-            break
+        if [ -e "/dev/disk/by-label/USERDATA" ] ; then
+          echo $SCRIPTNAME": USERDATA found"
+          break
         else
-          USERDATA=0
-          echo $SCRIPTNAME": USERDATA not found. Sleeping 1 and trying again"
+          echo $SCRIPTNAME": USERDATA not found. Sleeping 1 and trying again."
+          sleep 1
         fi
       done
     fi
-    #Check if USERDATA is mounted, if not try to mount it
-    if [ $USERDATA -eq 1 ] ; then
+    if [ ! -e "/dev/disk/by-label/USERDATA" ] ; then
+      echo $SCRIPTNAME": USERDATA not found"
+    else
+      #Get block device of USERDATA
+      USERDATA_DISK="/dev/"`ls -l /dev/disk/by-label | grep 'USERDATA' | cut -d "/" -f 3`
       echo $SCRIPTNAME": Checking if "$USERDATA_DISK" is mounted"
       if grep -qs $USERDATA_DISK /proc/mounts ; then
-        USERDATA_MNTPT=`grep $USERDATA_DISK /proc/mounts | cut -d " " -f 2 | grep '/media'`
+        echo $SCRIPTNAME": USERDATA found"
+        USERDATA_MNTPT=`grep $USERDATA_DISK /proc/mounts | cut -d " " -f 2 | grep 'media'`
         echo $SCRIPTNAME": USERDATA mounted at "$USERDATA_MNTPT
       else
-        echo $SCRIPTNAME": USERDATA not mounted. Sleeping 1 and trying again"
-        for i in $(seq 0 10)
-        do
-          sleep 1
-          if grep -qs $USERDATA_DISK /proc/mounts ; then
-            USERDATA_MNTPT=`grep $USERDATA_DISK /proc/mounts | cut -d " " -f 2 | grep '/media'`
-            echo $SCRIPTNAME": USERDATA mounted at "$USERDATA_MNTPT
-            break
-          else
-            echo $SCRIPTNAME": USERDATA not mounted. Sleeping 1 and trying again"
-          fi
-        done
+        echo $SCRIPTNAME": USERDATA not mounted. Attempting to mount"
+        mkdir -p /media/USERDATA
+        bin/mount -o rw,sync,noatime $USERDATA_DISK /media/USERDATA
+        USERDATA_MNTPT=`grep $USERDATA_DISK /proc/mounts | cut -d " " -f 2 | grep '/media'`
+        echo $SCRIPTNAME": USERDATA mounted at "$USERDATA_MNTPT
       fi
-    fi
-    if [ ! -z USERDATA_MNTPT ] ; then
-      echo $SCRIPTNAME": Checking for xbmc-data folder"
+      echo $SCRIPTNAME": Checking USERDATA for xbmc-data folder"
       if [ -d $USERDATA_MNTPT/xbmc-data ] ; then
         USERDATA_XBMC=1
-        echo $SCRIPTNAME": xbcm-data found"
+        echo $SCRIPTNAME": xbmc-data folder found"
       else
         USERDATA_XBMC=0
-  	    mkdir -p $USERDATA_MNTPT/xbmc-data
-        echo $SCRIPTNAME": xbmc-data not found. Folder created"
+        mkdir -p $USERDATA_MNTPT/xbmc-data
+        echo $SCRIPTNAME": xbmc-data folder not found. Folder created"
       fi
-      #Copy files if needed
       if [ $USERDATA_XBMC -ne 1 ] ; then
-        if [ -f /usr/share/splash/copying.fb.lzo ]; then
-         lzopcat /usr/share/splash/copying.fb.lzo > /dev/fb0
-      	fi
-	echo $SCRIPTNAME": Copying local data to USERDATA"
+        if [ -f /usr/share/splash/copying.fb.lzo ] ; then
+          lzopcat /usr/share/splash/copying.fb.lzo > /dev/fb0
+        fi
+        echo $SCRIPTNAME": Copying local data to USERDATA"
         echo $SCRIPTNAME": Mounting USERDATA async"
         /bin/mount -o remount,rw,async $USERDATA_MNTPT
         cp -a /tmp/userdata/* $USERDATA_MNTPT/xbmc-data
         if [ $? -ne 0 ] ; then
-          echo $SCRIPTNAME": Copying Error"
+          echo $SCRIPTNAME": Copying error"
         else
-          echo $SCRIPTNAME": Data Copied to USERDATA"
+          echo $SCRIPTNAME": Data copied to USERDATA successfully"
           USERDATA_XBMC=1
+          echo $SCRIPTNAME": Syncing data"
+          sync
+          echo $SCRIPTNAME": Remounting USERDATA sync for data integrity"
+          /bin/mount -o remount,rw,sync $USERDATA_MNTPT
         fi
-        echo $SCRIPTNAME": Syncing data"
-        sync
-        echo $SCRIPTNAME": Remounting sync for data integrity"
-        /bin/mount -o remount,rw,sync $USERDATA_MNTPT
       fi
       if [ $USERDATA_XBMC -eq 1 ] ; then
         echo $SCRIPTNAME": Creating userdata.internal for local data"
@@ -94,15 +79,14 @@ if [ "X$1" = "Xstart" ]; then
         /bin/mount -o bind /tmp/userdata /tmp/userdata.internal
         echo $SCRIPTNAME": Binding USERDATA/xbmc-data to /tmp/userdata"
         /bin/mount -o bind $USERDATA_MNTPT/xbmc-data /tmp/userdata
-        if [ -d "/tmp/userdata.internal/xios/root/.xbmc/temp" ] ; then
+        if [ ! -d "/tmp/userdata.internal/xios/root/.xbmc/temp" ] ; then
           echo $SCRIPTNAME": Creating local xbmc temp folder"
           mkdir -p /tmp/userdata.internal/xios/root/.xbmc/temp
         fi
-        if [ -d "/tmp/userdata/xios/root/.xbmc/temp" ] ; then
+        if [ ! -d "/tmp/userdata/xios/root/.xbmc/temp" ] ; then
           echo $SCRIPTNAME": Creating USERDATA xbmc temp folder"
           mkdir -p /tmp/userdata/xios/root/.xbmc/temp
         fi
-        # Bind temp on mtd to temp on USERDATA to account for sockets on fstab
         echo $SCRIPTNAME": Binding local xbmc temp to USERDATA temp"
         /bin/mount -o bind /tmp/userdata.internal/xios/root/.xbmc/temp /tmp/userdata/xios/root/.xbmc/temp
         echo $SCRIPTNAME": Binding USERDATA root to /root"
@@ -111,14 +95,38 @@ if [ "X$1" = "Xstart" ]; then
         /bin/mount -o bind /tmp/userdata.internal/xios/root/.xbmc/temp /root/.xbmc/temp
       fi
     fi
-    # Safety section, rename S94xbmc-pre if it was contains toys4me his script
-    if [ $USERDATA_XBMC -eq 1 ]; then
-      if grep -qs 'mount -o bind /media/sdcard' /tmp/userdata/xios/root/.xbmc/S94xbmc-pre; then
-       # Found S94xbmc script that manipulates userdata so rename it
-       echo $SCRIPTNAME":  Found dangerous S94xbmc-pre, renaming it"
-       mv  /tmp/userdata/xios/root/.xbmc/S94xbmc-pre /tmp/userdata/xios/root/.xbmc/S94xbmc-pre.disabled
+    # Safety section, rename S49xbmc-pre if it contains toys4me's script
+    if [ $USERDATA_XBMC -eq 1 ] ; then
+      if grep -qs 'mount -o bind /media/sdcard' /tmp/userdata/xios/root/.xbmc/S94xbmc-pre ; then
+        # Found S94xbmc-pre script that manipulates userdata so rename it
+        echo $SCRIPTNAME": Found potentially dangerous S94xbmc-pre script, renaming it"
+        mv /tmp/userdata/xios/root/.xbmc/S94xbmc-pre /tmp/userdata/xios/root/.xbmc/S94xbmc-pre.disabled
       fi
     fi
-    echo $SCRIPTNAME": done"
+    echo $SCRIPTNAME": Checking for dropbear keys on USERDATA"
+    if [ ! -d /tmp/userdata/dropbear ] ; then
+      echo $SCRIPTNAME": dropbear directory not found. Creating directory and keys"
+      mkdir -p /tmp/userdata/dropbear
+    else
+      echo $SCRIPTNAME": dropbear directory found."
+    fi
+    echo SCRIPTNAME": Checking for RSA key"
+    if [ -e /tmp/userdata/dropbear/dropbear_rsa_host_key ]; then
+      echo $SCRIPTNAME": Dropbear RSA key found"
+    else
+      echo $SCRIPTNAME": Dropbear RSA key not found. Generating RSA key"
+      /usr/bin/dropbearkey -t rsa -f /tmp/userdata/dropbear/dropbear_rsa_host_key > /dev/null 2>&1
+    fi
+    echo $SCRIPTNAME": Checking for DSS key"
+    if [ -e /tmp/userdata/dropbear/dropbear_rsa_dss_key ] ; then
+      echo $SCRIPTNAME": Dropbear DSS key found"
+    else
+      echo $SCRIPTNAME": Dropbear DSS key not found. Generating DSS key"
+      /usr/bin/dropbearkey -t dss -f /tmp/userdata/dropbear/dropbear_dss_host_key > /dev/null 2>&1
+    fi
+    echo $SCRIPTNAME": Placing keys in /tmp/etc directory"
+    cp -f /tmp/userdata/dropbear/dropbear_rsa_host_key /tmp/etc/dropbear/dropbear_rsa_host_key
+    cp -f /tmp/userdata/dropbear/dropbear_dss_host_key /tmp/etc/dropbear/dropbear_dss_host_key
+    echo $SCRIPTNAME": Done"
   fi
 fi
