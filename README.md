@@ -34,9 +34,9 @@ The following devices are supported at this moment;
 
       Pivos XIOS DS M3 == amlogic_xios_m3-xbmc_defconfig
 
-      Refee/OE Smart TV Box == amlogic_f16ref-xbmc_defconfig
+      Refee/OE Smart TV Box == amlogic_f16ref_gbox_1-xbmc_defconfig
 
-      GBox Midnight == amlogic_f16ref_gbox-xbmc_defconfig
+      GBox Midnight v2.+ == amlogic_f16ref_gbox-xbmc_defconfig
       
       GBox Midnight v2.0 == amlogic_f16ref_gbox_1-xbmc_defconfig
 
