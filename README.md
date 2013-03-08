@@ -36,7 +36,7 @@ The following devices are supported at this moment;
 
       Refee/OE Smart TV Box == amlogic_f16ref_gbox_1-xbmc_defconfig
 
-      GBox Midnight v2.+ == amlogic_f16ref_gbox-xbmc_defconfig
+      GBox Midnight v2.0+ == amlogic_f16ref_gbox-xbmc_defconfig
       
       GBox Midnight v2.0 == amlogic_f16ref_gbox_1-xbmc_defconfig
 
