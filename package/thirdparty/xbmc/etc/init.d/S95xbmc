@@ -21,19 +21,10 @@ case "$1" in
                    exit $exit_value
                    ;;
               64)  echo "XBMC exit with shutdown" >&2
-<<<<<<< HEAD
-		   lzopcat /usr/share/splash/stopping.fb.lzo > /dev/fb0
-                   echo 0 > /sys/class/graphics/fb0/blank
-                   sync
-                   /usr/bin/killall -q klogd
-                   /usr/bin/killall -q syslogd
-                   mount -o remount,ro /dev/mtdblock5
-=======
                    lzopcat /usr/share/splash/stopping.fb.lzo > /dev/fb0
                    echo 0 > /sys/class/graphics/fb0/blank
                    sync
                    /etc/init.d/S21hwclock stop
->>>>>>> upstream/master
                    mount -o remount,ro /tmp/userdata
                    mount -o remount,ro /tmp/userdata.internal 2>/dev/null
                    for dir in /media/*/
@@ -45,29 +36,16 @@ case "$1" in
                    exit $exit_value
                    ;;
               66)  echo "XBMC exit with reboot" >&2
-<<<<<<< HEAD
-		   lzopcat /usr/share/splash/stopping.fb.lzo > /dev/fb0
-                   echo 0 > /sys/class/graphics/fb0/blank
-                   sync
-                   /usr/bin/killall -q klogd
-                   /usr/bin/killall -q syslogd
-                   mount -o remount,ro /dev/mtdblock5
-=======
                    lzopcat /usr/share/splash/stopping.fb.lzo > /dev/fb0
                    echo 0 > /sys/class/graphics/fb0/blank
                    sync
                    /etc/init.d/S21hwclock stop
->>>>>>> upstream/master
                    mount -o remount,ro /tmp/userdata
                    mount -o remount,ro /tmp/userdata.internal 2>/dev/null
                    for dir in /media/*/
                    do
                         mount -o remount,ro ${dir%*/} 2>/dev/null
                    done
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/master
                    reboot
                    exit $exit_value
                    ;;
