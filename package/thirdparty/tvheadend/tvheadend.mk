@@ -4,7 +4,7 @@
 #
 ##############################################################
 
-TVHEADEND_VERSION = 3.0
+TVHEADEND_VERSION = babe15958e235ee9ec7b12bf455a908b95532936
 TVHEADEND_SITE_METHOD = git
 TVHEADEND_SITE = git://github.com/tvheadend/tvheadend.git
 TVHEADEND_INSTALL_STAGING = YES
@@ -35,13 +35,10 @@ define TVHEADEND_INSTALL_DB
 endef
 
 define TVHEADEND_INSTALL_INIT_SYSV
- $(INSTALL) -D package/thirdpart/tvheadend/S99tvheadend $(TARGET_DIR)/etc/init.d/S99tvheadend
+ $(INSTALL) -D package/thirdparty/tvheadend/S99tvheadend $(TARGET_DIR)/etc/init.d/S99tvheadend
 endef
 
 TVHEADEND_POST_INSTALL_TARGET_HOOKS  += TVHEADEND_INSTALL_DB
 TVHEADEND_POST_INSTALL_TARGET_HOOKS  += TVHEADEND_INSTALL_INIT_SYSV
 
-#----------------------------------------------------------------------------
-# tvheadend is not an autotools-based package, but it is possible to
-# call its ./configure script as if it were an autotools one.
-$(eval $(autotools-package))
+$(eval $(call AUTOTARGETS,package/thirdparty,tvheadend))
