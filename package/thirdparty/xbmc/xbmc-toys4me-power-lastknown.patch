@@ -22,15 +22,6 @@ index 7864292..c0a18f7 100644
  
  CPivosPowerSyscall::CPivosPowerSyscall()
  {
-@@ -32,7 +35,7 @@
-   }
-   else
-   {
--    m_CanPowerdown = false;
-+    m_CanPowerdown = true;
-     m_CanSuspend   = true;
-   }
-   m_CanHibernate = false;
 @@ -98,6 +101,52 @@ bool CPivosPowerSyscall::PumpPowerEvents(IPowerEventsCallback *callback)
      m_OnSuspend = false;
      // wait for all our threads to do their thing

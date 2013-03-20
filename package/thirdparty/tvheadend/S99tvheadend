@@ -10,19 +10,59 @@ PIDFILE=/var/run/$NAME.pid
 
 [ -f "${DAEMON}" -a -x "${DAEMON}" ] || exit 0
 
-# Read configuration variable file if it is present
-[ -r "/etc/default/${NAME}" ] && . "/etc/default/${NAME}"
+#
+# Default configuration for tvheadend
+#
+
+# TVH_ENABLED
+#   set to 0 to disable upstart job
+TVH_ENABLED=1
+
+# TVH_USER
+#   if set to "" will run as root
+TVH_USER=""
+
+# TVH_GROUP
+#   if set to "" will run as root
+TVH_GROUP=""
+
+# TVH_CONF_DIR
+#   if set to "" will use ~TVH_USER/.hts/tvheadend
+TVH_CONF_DIR="/root/.xbmc/tvheadend"
+
+# TVH_ADAPTERS
+#   if set to "" will use all available adapters
+#   for select adapters use comma seperated list of adapter
+#   numbers, i.e. to use /dev/dvb/adapter0 and /dev/dvb/adapter1 only
+#   set as "0,1"
+TVH_ADAPTERS=""
+
+# TVH_HTTP_PORT
+#   if set to "" will use binary default
+TVH_HTTP_PORT=""
+
+# TVH_HTTP_ROOT
+#   if set to "" will use binary default
+#   else will change the webui root context, useful for proxied
+#   servers
+TVH_HTTP_ROOT=""
+
+# TVH_HTSP_PORT
+#   if set to "" will use binary default
+TVH_HTSP_PORT=""
+
+# TVH_DELAY
+#   if set startup will be delayed N seconds to allow hardware init
+TVH_DELAY="10"
 
 ARGS="-f"
 [ -z "$TVH_USER"      ] || ARGS="$ARGS -u $TVH_USER"
 [ -z "$TVH_GROUP"     ] || ARGS="$ARGS -g $TVH_GROUP"
 [ -z "$TVH_CONF_DIR"  ] || ARGS="$ARGS -c $TVH_CONF_DIR"
 [ -z "$TVH_ADAPTERS"  ] || ARGS="$ARGS -a $TVH_ADAPTERS"
-[ "$TVH_IPV6" = "1"   ] && ARGS="$ARGS -6"
 [ -z "$TVH_HTTP_PORT" ] || ARGS="$ARGS --http_port $TVH_HTTP_PORT"
 [ -z "$TVH_HTTP_ROOT" ] || ARGS="$ARGS --http_root $TVH_HTTP_ROOT"
 [ -z "$TVH_HTSP_PORT" ] || ARGS="$ARGS --htsp_port $TVH_HTSP_PORT"
-[ "$TVH_DEBUG" = "1"  ] && ARGS="$ARGS -s"
 
 case "$1" in
     start)
