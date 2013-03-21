@@ -25,12 +25,9 @@ else
 TVHEADEND_CONFIGURE_OPTS   += --disable-imagecache
 endif
 
-define TVHEADEND_INSTALL_STAGING_CMDS
-	mkdir -p $(STAGING_DIR)/root/.hts/tvheadend
-	mkdir -p $(STAGING_DIR)/root/.hts/tvheadend/accesscontrol
-endef
-
 define TVHEADEND_INSTALL_TARGET_CMDS
+	mkdir -p $(TARGET_DIR)/root/.hts/tvheadend
+        mkdir -p $(TARGET_DIR)/root/.hts/tvheadend/accesscontrol
 	$(INSTALL) -D package/thirdparty/tvheadend/accesscontrol.1 $(TARGET_DIR)/root/.hts/tvheadend/accesscontrol/1
 	$(INSTALL) -D package/thirdparty/tvheadend/S55tvheadend $(TARGET_DIR)/etc/init.d/S55tvheadend
 endef
