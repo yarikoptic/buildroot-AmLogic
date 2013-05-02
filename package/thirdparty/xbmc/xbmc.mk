@@ -4,7 +4,7 @@
 #
 #################################################################################
 
-XBMC_VERSION = 410b590844f1b60e7171b1f974990de89e4f2e78
+XBMC_VERSION = d9119f2ae1a058e8b0df41e9e7cf6fb800c11ff4
 XBMC_SITE_METHOD = git
 XBMC_SITE = git://github.com/j1nx/xbmc.git
 XBMC_INSTALL_STAGING = YES
@@ -58,8 +58,6 @@ define XBMC_INSTALL_ETC
   cp -f package/thirdparty/xbmc/guisettings.xml $(TARGET_DIR)/usr/share/xbmc/system/
   cp -f package/thirdparty/xbmc/advancedsettings.xml $(TARGET_DIR)/usr/share/xbmc/system/
   cp -f package/thirdparty/xbmc/nobs.xml $(TARGET_DIR)/usr/share/xbmc/system/keymaps/
-  cp -f package/thirdparty/xbmc/mouse.xml $(TARGET_DIR)/usr/share/xbmc/system/keymaps/
-  cp -f package/thirdparty/xbmc/keyboard.xml $(TARGET_DIR)/usr/share/xbmc/system/keymaps/
 endef
 
 define XBMC_INSTALL_REMOTE_CONF
