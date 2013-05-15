@@ -1,7 +1,7 @@
 From 5576b12565d0d2dae06207b19df983d7ae321c79 Mon Sep 17 00:00:00 2001
 From: Anton Fedchin <afedchin@ruswizards.com>
 Date: Wed, 27 Feb 2013 15:04:53 +0400
-Subject: [PATCH] Added pvr.iptvsimple addon.
+Subject: [PATCH 1/3] Added pvr.iptvsimple addon.
 
 ---
  addons/Makefile.am                                 |    1 +
@@ -7267,5 +7267,603 @@ index 3b487ed..eb3a16e 100644
  	GlobalSection(SolutionProperties) = preSolution
  		HideSolutionNode = FALSE
 -- 
-1.8.1.5
+1.8.1.6
+
+
+From f656ca5641877668b6484fb0b1e050662b3e32c9 Mon Sep 17 00:00:00 2001
+From: Anton Fedchin <afedchin@ruswizards.com>
+Date: Wed, 27 Mar 2013 19:23:41 +0400
+Subject: [PATCH 2/3] [iptvsimple] bumped api to v1.7.0
+
+---
+ addons/pvr.iptvsimple/addon/addon.xml.in           |  4 +-
+ .../addon/resources/language/French/strings.po     | 71 ++++++++++++++++++++++
+ addons/pvr.iptvsimple/src/client.cpp               | 17 ++++++
+ addons/pvr.iptvsimple/src/client.h                 |  3 +-
+ 4 files changed, 92 insertions(+), 3 deletions(-)
+ create mode 100644 addons/pvr.iptvsimple/addon/resources/language/French/strings.po
+
+diff --git a/addons/pvr.iptvsimple/addon/addon.xml.in b/addons/pvr.iptvsimple/addon/addon.xml.in
+index 73b61a9..e8fd9b3 100644
+--- a/addons/pvr.iptvsimple/addon/addon.xml.in
++++ b/addons/pvr.iptvsimple/addon/addon.xml.in
+@@ -1,12 +1,12 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <addon
+   id="pvr.iptvsimple"
+-  version="0.1.1"
++  version="0.1.2"
+   name="PVR IPTV Simple Client"
+   provider-name="nightik">
+   <requires>
+     <c-pluff version="0.1"/>
+-    <import addon="xbmc.pvr" version="1.6.0"/>
++    <import addon="xbmc.pvr" version="1.7.0"/>
+   </requires>
+   <extension
+     point="xbmc.pvrclient"
+diff --git a/addons/pvr.iptvsimple/addon/resources/language/French/strings.po b/addons/pvr.iptvsimple/addon/resources/language/French/strings.po
+new file mode 100644
+index 0000000..73663c6
+--- /dev/null
++++ b/addons/pvr.iptvsimple/addon/resources/language/French/strings.po
+@@ -0,0 +1,71 @@
++# XBMC Media Center language file
++# Addon Name: PVR IP-TV Simple Client
++# Addon id: pvr.iptvsimple
++# Addon version: 0.1.2
++# Addon Provider: nightik
++# Translators:
++msgid ""
++msgstr ""
++"Project-Id-Version: PVR-IPTV Simple\n"
++"Report-Msgid-Bugs-To: http://trac.xbmc.org/\n"
++"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
++"PO-Revision-Date: 2013-02-27 06:56+0000\n"
++"Last-Translator: numa001 <manu.robinet@free.fr>\n"
++"Language-Team: English (http://www.transifex.com/projects/p/XBMC-Main-Frodo/language/en/)\n"
++"MIME-Version: 1.0\n"
++"Content-Type: text/plain; charset=UTF-8\n"
++"Content-Transfer-Encoding: 8bit\n"
++"Language: fr\n"
++"Plural-Forms: nplurals=2; plural=(n > 1);\n"
++
++msgctxt "#30000"
++msgid "File Location"
++msgstr "Emplacement du fichier"
++
++msgctxt "#30001"
++msgid "Local Path (include Local Network)"
++msgstr "Chemin local (inclue le réseau local)"
++
++msgctxt "#30002"
++msgid "Remote Path (Internet address)"
++msgstr "Chemin d'accès (adresse internet)"
++
++msgctxt "#30010"
++msgid "Play List Settings"
++msgstr "Paramètres de la Playlist"
++
++msgctxt "#30011"
++msgid "M3U Play List Path"
++msgstr "Chemin de la Playlist M3U"
++
++msgctxt "#30012"
++msgid "M3U Play List URL"
++msgstr "URL de la playlist M3U"
++
++msgctxt "#30020"
++msgid "EPG Settings"
++msgstr "Paramètres EPG"
++
++msgctxt "#30021"
++msgid "XMLTV Path"
++msgstr "Chemin du fichier XMLTV"
++
++msgctxt "#30022"
++msgid "XMLTV URL"
++msgstr "URL du fichier XMLTV"
++
++msgctxt "#30023"
++msgid "Apply Time Shift To All Channels"
++msgstr "Appliquer un décalage horaire sur toutes les chaînes"
++
++msgctxt "#30024"
++msgid "EPG Time Shift (hours)"
++msgstr "Décalage horaire de l'EPG (heures)"
++
++msgctxt "#30030"
++msgid "Channels Logos"
++msgstr "Logos des chaînes"
++
++msgctxt "#30031"
++msgid "Channels Logos Folder"
++msgstr "Répertoire des Logos de chaînes"
+diff --git a/addons/pvr.iptvsimple/src/client.cpp b/addons/pvr.iptvsimple/src/client.cpp
+index 59514ec..b7367e3 100644
+--- a/addons/pvr.iptvsimple/src/client.cpp
++++ b/addons/pvr.iptvsimple/src/client.cpp
+@@ -319,6 +319,10 @@ void ADDON_FreeSettings()
+ {
+ }
+ 
++void ADDON_Announce(const char *flag, const char *sender, const char *message, const void *data)
++{
++}
++
+ /***********************************************************
+  * PVR Client AddOn specific public library functions
+  ***********************************************************/
+@@ -335,6 +339,18 @@ const char* GetMininumPVRAPIVersion(void)
+   return strMinApiVersion;
+ }
+ 
++const char* GetGUIAPIVersion(void)
++{
++  static const char *strGuiApiVersion = XBMC_GUI_API_VERSION;
++  return strGuiApiVersion;
++}
++
++const char* GetMininumGUIAPIVersion(void)
++{
++  static const char *strMinGuiApiVersion = XBMC_GUI_MIN_API_VERSION;
++  return strMinGuiApiVersion;
++}
++
+ PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
+ {
+   pCapabilities->bSupportsEPG             = true;
+@@ -494,6 +510,7 @@ void DemuxFlush(void) {}
+ PVR_ERROR SetRecordingPlayCount(const PVR_RECORDING &recording, int count) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR SetRecordingLastPlayedPosition(const PVR_RECORDING &recording, int lastplayedposition) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ int GetRecordingLastPlayedPosition(const PVR_RECORDING &recording) { return -1; }
++PVR_ERROR GetRecordingEdl(const PVR_RECORDING&, PVR_EDL_ENTRY[], int*) { return PVR_ERROR_NOT_IMPLEMENTED; };
+ int GetTimersAmount(void) { return -1; }
+ PVR_ERROR GetTimers(ADDON_HANDLE handle) { return PVR_ERROR_NOT_IMPLEMENTED; }
+ PVR_ERROR AddTimer(const PVR_TIMER &timer) { return PVR_ERROR_NOT_IMPLEMENTED; }
+diff --git a/addons/pvr.iptvsimple/src/client.h b/addons/pvr.iptvsimple/src/client.h
+index 7d08072..3da13be 100644
+--- a/addons/pvr.iptvsimple/src/client.h
++++ b/addons/pvr.iptvsimple/src/client.h
+@@ -25,8 +25,9 @@
+ 
+ #include "libXBMC_addon.h"
+ #include "libXBMC_pvr.h"
++#include "libXBMC_gui.h"
+ 
+-#define PVR_CLIENT_VERSION     "0.1.1"
++#define PVR_CLIENT_VERSION     "0.1.2"
+ #define M3U_FILE_NAME          "iptv.m3u"
+ #define TVG_FILE_NAME          "xmltv.xml.gz"
+ #define DEFAULT_TVG_PATH       "http://www.teleguide.info/download/new3/xmltv.xml.gz"
+-- 
+1.8.1.6
+
+
+From 2e1fc21d4d875e1868d4d466b89b602813c7bb63 Mon Sep 17 00:00:00 2001
+From: Anton Fedchin <afedchin@ruswizards.com>
+Date: Mon, 22 Apr 2013 17:41:02 +0400
+Subject: [PATCH 3/3] [iptvsimple] new version 0.1.3 added radio channels
+ support. added proper description in addon.xml. added tar compression support
+ to xmltv file. fix channel naming. fix possible crashes on save settings.
+ remove teleguide.info from default settings.
+
+---
+ addons/pvr.iptvsimple/addon/addon.xml.in           |  11 ++-
+ addons/pvr.iptvsimple/addon/resources/settings.xml |   2 +-
+ addons/pvr.iptvsimple/src/PVRIptvData.cpp          |  90 +++++++++++++-----
+ addons/pvr.iptvsimple/src/client.cpp               | 103 +++------------------
+ addons/pvr.iptvsimple/src/client.h                 |   7 +-
+ 5 files changed, 90 insertions(+), 123 deletions(-)
+
+diff --git a/addons/pvr.iptvsimple/addon/addon.xml.in b/addons/pvr.iptvsimple/addon/addon.xml.in
+index e8fd9b3..f29a58c 100644
+--- a/addons/pvr.iptvsimple/addon/addon.xml.in
++++ b/addons/pvr.iptvsimple/addon/addon.xml.in
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <addon
+   id="pvr.iptvsimple"
+-  version="0.1.2"
++  version="0.1.3"
+   name="PVR IPTV Simple Client"
+   provider-name="nightik">
+   <requires>
+@@ -16,9 +16,12 @@
+     library_windx="XBMC_IPTV_Simple_win32.dll"
+     library_android="libXBMC_IPTV_Simple.so" />
+   <extension point="xbmc.addon.metadata">
+-    <summary lang="en">IPTV Simple PVR Client</summary>
+-    <description lang="en">IPTV Simple PVR Client</description>
+-    <disclaimer lang="en"></disclaimer>
++    <summary lang="en">XBMC PVR addon for IPTV support. https://github.com/afedchin/xbmc-addon-iptvsimple/wiki/IPTV-Simple-Home</summary>
++    <summary lang="ru">XBMC PVR аддон для поддержки IPTV.  https://github.com/afedchin/xbmc-addon-iptvsimple/wiki/IPTV-Simple-Home</summary>
++    <description lang="en">IPTV Simple PVR Client support m3u playlists, streaming of Live TV for multicast/unicast sources, listening to Radio channels and EPG.</description>
++    <description lang="ru">Интерфейс для IPTV. Поддерживает просмотр потокового ТВ для юникаст/мультикаст источников, прослушивание радиоканалов и работу с электронным телегидом.</description>
++    <disclaimer lang="en">This is unstable software! The authors are in no way responsible for failed playings, incorrect EPG times, wasted hours, or any other undesirable effects.</disclaimer>
++    <disclaimer lang="ru">Это нестабильная программа! Авторы не несут ответственности за неудачные воспроизведение, неверные время EPG, потраченное время и прочие нежелательные эффекты.</disclaimer>
+     <platform>@OS@</platform>
+   </extension>
+ </addon>
+diff --git a/addons/pvr.iptvsimple/addon/resources/settings.xml b/addons/pvr.iptvsimple/addon/resources/settings.xml
+index beac601..63d42a6 100644
+--- a/addons/pvr.iptvsimple/addon/resources/settings.xml
++++ b/addons/pvr.iptvsimple/addon/resources/settings.xml
+@@ -8,7 +8,7 @@
+ 	<setting id="sep2" label="30020" type="lsep"/>
+ 	<setting id="epgPathType" type="enum" label="30000" lvalues="30001|30002" default="1" />
+ 	<setting id="epgPath" type="file" label="30021" default="" visible="eq(-1,0)"/>
+-	<setting id="epgUrl" type="text" label="30022" default="http://www.teleguide.info/download/new3/xmltv.xml.gz" visible="eq(-2,1)"/>
++	<setting id="epgUrl" type="text" label="30022" default="" visible="eq(-2,1)"/>
+ <!--	<setting id="epgTimeShift" type="slider" label="30024" default="0" range="-12,.5,12" option="float"/>-->
+ 	<setting id="epgTimeShift_" type="enum" label="30024" default="12" values="-12|-11|-10|-9|-8|-7|-6|-5|-4|-3|-2|-1|0|+1|+2|+3|+4|+5|+6|+7|+8|+9|+10|+11|+12"/>-->
+ 	<setting id="epgTSOverride" type="bool" label="30023" default="false"/>
+diff --git a/addons/pvr.iptvsimple/src/PVRIptvData.cpp b/addons/pvr.iptvsimple/src/PVRIptvData.cpp
+index 490fa47..a5ac520 100644
+--- a/addons/pvr.iptvsimple/src/PVRIptvData.cpp
++++ b/addons/pvr.iptvsimple/src/PVRIptvData.cpp
+@@ -41,6 +41,7 @@
+ #define TVG_INFO_SHIFT_MARKER  "tvg-shift="
+ 
+ #define GROUP_NAME_MARKER      "group-title="
++#define RADIO_MARKER           "radio="
+ #define SECONDS_IN_DAY		   86400
+ 
+ using namespace std;
+@@ -104,6 +105,13 @@ void *PVRIptvData::Process(void)
+ 
+ bool PVRIptvData::LoadEPG(time_t iStart, time_t iEnd) 
+ {
++	if (m_strXMLTVUrl.IsEmpty())
++	{
++		XBMC->Log(LOG_NOTICE, "EPG file path is not configured. EPG not loaded.");
++		m_bEGPLoaded = true;
++		return false;
++	}
++
+ 	std::string data;
+ 	std::string decompressed;
+ 	int iReaded = 0;
+@@ -130,6 +138,8 @@ bool PVRIptvData::LoadEPG(time_t iStart, time_t iEnd)
+ 	}
+ 
+ 	char * buffer;
++
++    // gzip packed
+ 	if (data[0] == '\x1F' && 
+ 		data[1] == '\x8B' && 
+ 		data[2] == '\x08') 
+@@ -147,6 +157,23 @@ bool PVRIptvData::LoadEPG(time_t iStart, time_t iEnd)
+ 		buffer = &(data[0]);
+ 	}
+ 
++    // xml should starts with '<?xml'
++	if (buffer[0] != '\x3C' || buffer[1] != '\x3F' || buffer[2] != '\x78' ||
++		buffer[3] != '\x6D' || buffer[4] != '\x6C')
++	{
++		// check for tar archive
++		if (strcmp(buffer + 0x101, "ustar") ||
++			strcmp(buffer + 0x101, "GNUtar"))
++		{
++			buffer += 0x200; // RECORDSIZE = 512
++		}
++		else
++		{
++			m_bEGPLoaded = true;
++			return false;
++		}
++	}
++
+ 	xml_document<> xmlDoc;
+ 	try 
+ 	{
+@@ -285,6 +312,12 @@ bool PVRIptvData::LoadEPG(time_t iStart, time_t iEnd)
+ 
+ bool PVRIptvData::LoadPlayList(void) 
+ {
++	if (m_strM3uUrl.IsEmpty())
++	{
++		XBMC->Log(LOG_NOTICE, "Playlist file path is not configured. Channels not loaded.");
++		return false;
++	}
++
+ 	CStdString strPlaylistContent;
+ 	if (!GetCachedFileContents(M3U_FILE_NAME, m_strM3uUrl, strPlaylistContent))
+ 	{
+@@ -295,7 +328,7 @@ bool PVRIptvData::LoadPlayList(void)
+ 	std::stringstream stream(strPlaylistContent);
+ 
+ 	/* load channels */
+-	bool isfirst = true;
++	bool bFirst = true;
+ 
+ 	int iUniqueChannelId = 0;
+ 	int iUniqueGroupId = 0;
+@@ -324,9 +357,9 @@ bool PVRIptvData::LoadPlayList(void)
+ 			continue;
+ 		}
+ 
+-		if (isfirst) 
++		if (bFirst) 
+ 		{
+-			isfirst = false;
++			bFirst = false;
+ 			if (strLine.Left(3) == "\xEF\xBB\xBF")
+ 			{
+ 				strLine.Delete(0, 3);
+@@ -343,15 +376,17 @@ bool PVRIptvData::LoadPlayList(void)
+ 			}
+ 		}
+ 
+-		double		fTvgShift = 0;
+-		CStdString	strChnlName = "";
+-		CStdString	strTvgId = "";
+-		CStdString	strTvgName = "";
+-		CStdString	strTvgLogo = "";
+-		CStdString	strGroupName = "";
+-
+ 		if (strLine.Left((int)strlen(M3U_INFO_MARKER)) == M3U_INFO_MARKER) 
+ 		{
++			bool        bRadio       = false;
++			double      fTvgShift    = 0;
++			CStdString	strChnlName  = "";
++			CStdString	strTvgId     = "";
++			CStdString	strTvgName   = "";
++			CStdString	strTvgLogo   = "";
++			CStdString	strGroupName = "";
++			CStdString	strRadio     = "";
++
+ 			// parse line
+ 			int iColon = (int)strLine.Find(':');
+ 			int iComma = (int)strLine.ReverseFind(',');
+@@ -359,7 +394,7 @@ bool PVRIptvData::LoadPlayList(void)
+ 			{
+ 				// parse name
+ 				iComma++;
+-				strChnlName = strLine.Right((int)strLine.size() - iComma);
++				strChnlName = strLine.Right((int)strLine.size() - iComma).Trim();
+ 				tmpChannel.strChannelName = XBMC->UnknownToUTF8(strChnlName);
+ 
+ 				// parse info
+@@ -369,6 +404,7 @@ bool PVRIptvData::LoadPlayList(void)
+ 				strTvgName = ReadMarkerValue(strInfoLine, TVG_INFO_NAME_MARKER);
+ 				strTvgLogo = ReadMarkerValue(strInfoLine, TVG_INFO_LOGO_MARKER);
+ 				strGroupName = ReadMarkerValue(strInfoLine, GROUP_NAME_MARKER);
++				strRadio = ReadMarkerValue(strInfoLine, RADIO_MARKER);
+ 				fTvgShift = atof(ReadMarkerValue(strInfoLine, TVG_INFO_SHIFT_MARKER));
+ 
+ 				if (strTvgId.IsEmpty())
+@@ -382,10 +418,12 @@ bool PVRIptvData::LoadPlayList(void)
+ 					strTvgLogo = strChnlName;
+ 				}
+ 
+-				tmpChannel.strTvgId = strTvgId;
++				bRadio = !strRadio.CompareNoCase("true");
++				tmpChannel.strTvgId   = strTvgId;
+ 				tmpChannel.strTvgName = XBMC->UnknownToUTF8(strTvgName);
+ 				tmpChannel.strTvgLogo = XBMC->UnknownToUTF8(strTvgLogo);
+-				tmpChannel.iTvgShift = (int)(fTvgShift * 3600.0);
++				tmpChannel.iTvgShift  = (int)(fTvgShift * 3600.0);
++				tmpChannel.bRadio     = bRadio;
+ 
+ 				if (tmpChannel.iTvgShift == 0 && iEPGTimeShift != 0)
+ 				{
+@@ -402,7 +440,7 @@ bool PVRIptvData::LoadPlayList(void)
+ 						PVRIptvChannelGroup group;
+ 						group.strGroupName = strGroupName;
+ 						group.iGroupId = ++iUniqueGroupId;
+-						group.bRadio = false;
++						group.bRadio = bRadio;
+ 
+ 						m_groups.push_back(group);
+ 						iCurrentGroupId = iUniqueGroupId;
+@@ -417,29 +455,31 @@ bool PVRIptvData::LoadPlayList(void)
+ 		else if (strLine[0] != '#')
+ 		{
+ 			PVRIptvChannel channel;
+-			channel.iUniqueId		= ++iUniqueChannelId;
+-			channel.iChannelNumber	= ++iChannelNum;
+-			channel.strTvgId		= tmpChannel.strTvgId;
+-			channel.strChannelName	= tmpChannel.strChannelName;
+-			channel.strTvgName		= tmpChannel.strTvgName;
+-			channel.strTvgLogo		= tmpChannel.strTvgLogo;
+-			channel.iTvgShift		= tmpChannel.iTvgShift;
+-			channel.strStreamURL	= strLine;
++			channel.iUniqueId         = ++iUniqueChannelId;
++			channel.iChannelNumber    = ++iChannelNum;
++			channel.strTvgId          = tmpChannel.strTvgId;
++			channel.strChannelName    = tmpChannel.strChannelName;
++			channel.strTvgName        = tmpChannel.strTvgName;
++			channel.strTvgLogo        = tmpChannel.strTvgLogo;
++			channel.iTvgShift         = tmpChannel.iTvgShift;
++			channel.bRadio            = tmpChannel.bRadio;
++			channel.strStreamURL      = strLine;
+ 			channel.iEncryptionSystem = 0;
+-			channel.bRadio = false;
+-
+-			m_channels.push_back(channel);
+ 
+ 			if (iCurrentGroupId > 0) 
+ 			{
++				channel.bRadio = m_groups.at(iCurrentGroupId - 1).bRadio;
+ 				m_groups.at(iCurrentGroupId - 1).members.push_back(channel.iChannelNumber);
+ 			}
+ 
++			m_channels.push_back(channel);
++
+ 			tmpChannel.strTvgId = "";
+ 			tmpChannel.strChannelName = "";
+ 			tmpChannel.strTvgName = "";
+ 			tmpChannel.strTvgLogo = "";
+ 			tmpChannel.iTvgShift = 0;
++			tmpChannel.bRadio = false;
+ 		}
+ 	}
+   
+diff --git a/addons/pvr.iptvsimple/src/client.cpp b/addons/pvr.iptvsimple/src/client.cpp
+index b7367e3..6f7b50b 100644
+--- a/addons/pvr.iptvsimple/src/client.cpp
++++ b/addons/pvr.iptvsimple/src/client.cpp
+@@ -50,7 +50,7 @@
+ CHelper_libXBMC_addon *XBMC           = NULL;
+ CHelper_libXBMC_pvr   *PVR            = NULL;
+ 
+-std::string g_strTvgPath              = DEFAULT_TVG_PATH;
++std::string g_strTvgPath              = "";
+ std::string g_strM3UPath              = "";
+ std::string g_strLogoPath             = "";
+ int         g_iEPGTimeShift           = 0;
+@@ -112,10 +112,6 @@ void ADDON_ReadSettings(void)
+ 	{
+ 		g_strTvgPath = buffer;
+ 	}
+-	if (g_strTvgPath == "") 
+-	{
+-		g_strTvgPath = DEFAULT_TVG_PATH;
+-	}
+     // BUG! xbmc does not return slider value 
+ 	/*float dTimeShift;
+ 	if (XBMC->GetSetting("epgTimeShift", &dTimeShift))
+@@ -215,100 +211,29 @@ unsigned int ADDON_GetSettings(ADDON_StructSetting ***sSet)
+ 
+ ADDON_STATUS ADDON_SetSetting(const char *settingName, const void *settingValue)
+ {
+-	string str = settingName;
+-	if (str == "m3uPathType" /*|| str == "m3uUrl" || str == "m3uPath"*/)
++	// reset cache and restart addon 
++
++	string strFile = GetUserFilePath(M3U_FILE_NAME);
++	if (XBMC->FileExists(strFile.c_str(), false))
+ 	{
+-		int iPathType = 0;
+-		char buffer[1024];
+-		string strTmp = g_strM3UPath;
+-
+-		if (!XBMC->GetSetting("m3uPathType", &iPathType)) 
+-		{
+-			iPathType = 1;
+-		}
+-		CStdString strName = iPathType ? "m3uUrl" : "m3uPath";
+-		if (XBMC->GetSetting(strName, &buffer)) 
+-		{
+-			g_strM3UPath = buffer;
+-		}
+-		if (g_strM3UPath != strTmp) 
+-		{
+-			string strFile = GetUserFilePath(M3U_FILE_NAME);
+-			if (XBMC->FileExists(strFile.c_str(), false))
+-			{
+ #ifdef _WIN32
+-				DeleteFile(strFile.c_str());
++		DeleteFile(strFile.c_str());
+ #else
+-				XBMC->DeleteFile(strFile.c_str());
++		XBMC->DeleteFile(strFile.c_str());
+ #endif
+-			}
+-			// TODO inspecting crashes
+-			// m_data->ReloadPlayList(g_strM3UPath.c_str());
+-
+-			return ADDON_STATUS_OK;
+-		}
+ 	}
+-	if (str == "epgPathType" /*|| str == "epgPath" || str == "epgUrl"*/)
++
++	strFile = GetUserFilePath(TVG_FILE_NAME);
++	if (XBMC->FileExists(strFile.c_str(), false))
+ 	{
+-		int iPathType = 0;
+-		char buffer[1024];
+-		string strTmp = g_strTvgPath;
+-
+-		if (!XBMC->GetSetting("epgPathType", &iPathType)) 
+-		{
+-			iPathType = 1;
+-		}
+-		CStdString strName = iPathType ? "epgUrl" : "epgPath";
+-		if (XBMC->GetSetting(strName, &buffer)) 
+-		{
+-			g_strTvgPath = buffer;
+-		}
+-		if (g_strTvgPath != strTmp) 
+-		{
+-			string strFile = GetUserFilePath(TVG_FILE_NAME);
+-			if (XBMC->FileExists(strFile.c_str(), false))
+-			{
+ #ifdef _WIN32
+-				DeleteFile(strFile.c_str());
++		DeleteFile(strFile.c_str());
+ #else
+-				XBMC->DeleteFile(strFile.c_str());
++		XBMC->DeleteFile(strFile.c_str());
+ #endif
+-			}
+-			// TODO inspecting crashes
+-			//m_data->ReloadEPG(g_strTvgPath.c_str());
+-
+-			return ADDON_STATUS_OK;
+-		}
+-	}
+-	if (str == "epgTimeShift")
+-	{
+-		double dTimeShift = *(double*) settingValue;
+-		int iTimeShift = (int) (dTimeShift * 3600.0);
+-		if (g_iEPGTimeShift != iTimeShift)
+-		{
+-			return ADDON_STATUS_OK;
+-		}
+-	}
+-	if (str == "epgTSOverride")
+-	{
+-		bool bOverride = *(bool*) settingValue;
+-		if (g_bTSOverride != bOverride)
+-		{
+-			return ADDON_STATUS_OK;
+-		}
+-	}
+-	if (str == "logoPath")
+-	{
+-		std::string strTmp = g_strLogoPath;
+-		g_strLogoPath = (const char*) settingValue;
+-		if (g_strLogoPath != strTmp)
+-		{
+-			m_data->ReaplyChannelsLogos(g_strLogoPath.c_str());
+-		}
+-		return ADDON_STATUS_OK;
+ 	}
+ 
+-	return ADDON_STATUS_OK;
++	return ADDON_STATUS_NEED_RESTART;
+ }
+ 
+ void ADDON_Stop()
+@@ -355,7 +280,7 @@ PVR_ERROR GetAddonCapabilities(PVR_ADDON_CAPABILITIES* pCapabilities)
+ {
+   pCapabilities->bSupportsEPG             = true;
+   pCapabilities->bSupportsTV              = true;
+-  pCapabilities->bSupportsRadio           = false;
++  pCapabilities->bSupportsRadio           = true;
+   pCapabilities->bSupportsChannelGroups   = true;
+   pCapabilities->bSupportsRecordings      = false;
+ 
+diff --git a/addons/pvr.iptvsimple/src/client.h b/addons/pvr.iptvsimple/src/client.h
+index 3da13be..6bebfb8 100644
+--- a/addons/pvr.iptvsimple/src/client.h
++++ b/addons/pvr.iptvsimple/src/client.h
+@@ -27,10 +27,9 @@
+ #include "libXBMC_pvr.h"
+ #include "libXBMC_gui.h"
+ 
+-#define PVR_CLIENT_VERSION     "0.1.2"
+-#define M3U_FILE_NAME          "iptv.m3u"
+-#define TVG_FILE_NAME          "xmltv.xml.gz"
+-#define DEFAULT_TVG_PATH       "http://www.teleguide.info/download/new3/xmltv.xml.gz"
++#define PVR_CLIENT_VERSION     "0.1.3"
++#define M3U_FILE_NAME          "iptv.m3u.cache"
++#define TVG_FILE_NAME          "xmltv.xml.cache"
+ 
+ /*!
+  * @brief PVR macros for string exchange
+-- 
+1.8.1.6
 
