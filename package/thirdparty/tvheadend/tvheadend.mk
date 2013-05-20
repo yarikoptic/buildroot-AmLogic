@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #############################################################
 #
 # tvheadend
@@ -5,6 +6,9 @@
 ##############################################################
 
 TVHEADEND_VERSION = 3.2patch2
+=======
+TVHEADEND_VERSION = v3.4
+>>>>>>> upstream/master
 TVHEADEND_SITE_METHOD = git
 TVHEADEND_SITE = git://github.com/tvheadend/tvheadend.git
 TVHEADEND_INSTALL_STAGING = YES
