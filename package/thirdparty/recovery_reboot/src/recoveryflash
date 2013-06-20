@@ -6,6 +6,6 @@ fi
 if [ ! -f "${IMAGE}" ]; then
 exit 1
 fi
-mv -f "${IMAGE}" /recovery/update.zip || exit 1
-echo "--update_package=/cache/update.zip" > /recovery/tlbb_ota.upg || exit 1
+mv -f "${IMAGE}" /media/usb0/update.zip || exit 1
+echo "--update_package=/udisk/update.zip" > /media/usb0/factory_update_param.aml || exit 1
 reboot recovery
