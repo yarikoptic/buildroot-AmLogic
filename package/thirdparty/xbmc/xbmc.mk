@@ -4,7 +4,7 @@
 #
 #################################################################################
 
-XBMC_VERSION = a5e57d8ab0a90173ea5a591b6481a1266bae2294
+XBMC_VERSION = be8dedec362a726ca338984cfac4f252d14bc262
 XBMC_SITE_METHOD = git
 XBMC_SITE = git://github.com/j1nx/xbmc.git
 XBMC_INSTALL_STAGING = YES
