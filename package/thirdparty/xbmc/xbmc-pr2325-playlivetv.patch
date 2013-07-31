@@ -13,11 +13,9 @@ When called, it first tries to play the last watched channel - if this fails/is 
  xbmc/pvr/PVRManager.h           |   22 +++++++++
  5 files changed, 136 insertions(+)
 
-diff --git a/xbmc/Application.cpp b/xbmc/Application.cpp
-index 4afcf60..5141799 100644
 --- a/xbmc/Application.cpp
 +++ b/xbmc/Application.cpp
-@@ -2733,6 +2733,10 @@ bool CApplication::OnAction(const CAction &action)
+@@ -2726,6 +2726,10 @@ bool CApplication::OnAction(const CActio
      return true;
    }
  
@@ -28,8 +26,6 @@ index 4afcf60..5141799 100644
    if (IsPlaying())
    {
      // forward channel switches to the player - he knows what to do
-diff --git a/xbmc/guilib/Key.h b/xbmc/guilib/Key.h
-index 04a8ff3..3aff2dc 100644
 --- a/xbmc/guilib/Key.h
 +++ b/xbmc/guilib/Key.h
 @@ -277,6 +277,9 @@
@@ -42,11 +38,9 @@ index 04a8ff3..3aff2dc 100644
  
  #define ACTION_TOGGLE_FULLSCREEN      199 // switch 2 desktop resolution
  #define ACTION_TOGGLE_WATCHED         200 // Toggle watched status (videos)
-diff --git a/xbmc/input/ButtonTranslator.cpp b/xbmc/input/ButtonTranslator.cpp
-index d5ff66a..9e62424 100644
 --- a/xbmc/input/ButtonTranslator.cpp
 +++ b/xbmc/input/ButtonTranslator.cpp
-@@ -223,6 +223,9 @@
+@@ -222,6 +222,9 @@ static const ActionMapping actions[] =
          {"channeldown"           , ACTION_CHANNEL_DOWN},
          {"previouschannelgroup"  , ACTION_PREVIOUS_CHANNELGROUP},
          {"nextchannelgroup"      , ACTION_NEXT_CHANNELGROUP},
@@ -56,8 +50,6 @@ index d5ff66a..9e62424 100644
  
          // Mouse actions
          {"leftclick"         , ACTION_MOUSE_LEFT_CLICK},
-diff --git a/xbmc/pvr/PVRManager.cpp b/xbmc/pvr/PVRManager.cpp
-index 7b98a6b..989b350 100644
 --- a/xbmc/pvr/PVRManager.cpp
 +++ b/xbmc/pvr/PVRManager.cpp
 @@ -53,6 +53,7 @@
@@ -68,7 +60,7 @@ index 7b98a6b..989b350 100644
  
  using namespace std;
  using namespace MUSIC_INFO;
-@@ -1023,6 +1024,73 @@ bool CPVRManager::StartPlayback(const CPVRChannel *channel, bool bPreview /* = f
+@@ -1023,6 +1024,76 @@ bool CPVRManager::StartPlayback(const CP
    return true;
  }
  
@@ -130,9 +122,12 @@ index 7b98a6b..989b350 100644
 +  if (!bReturn)
 +  {
 +    CLog::Log(LOGNOTICE, "PVRManager - %s - could not determine %s channel to start playback with. No last played channel found, and first channel of active group could also not be determined.", __FUNCTION__, bIsRadio ? "radio": "tv");
++
++    CStdString msg;
++    msg.Format(g_localizeStrings.Get(19035).c_str(), g_localizeStrings.Get(bIsRadio ? 19021 : 19020).c_str()); // RADIO/TV could not be played. Check the log for details.
 +    CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Error,
 +            g_localizeStrings.Get(19166), // PVR information
-+            g_localizeStrings.Get(19035)); // This channel cannot be played. Check the log for details.
++            msg);
 +  }
 +
 +  return bReturn;
@@ -142,7 +137,20 @@ index 7b98a6b..989b350 100644
  bool CPVRManager::PerformChannelSwitch(const CPVRChannel &channel, bool bPreview)
  {
    // check parental lock state
-@@ -1323,6 +1391,42 @@ void CPVRManager::ExecutePendingJobs(void)
+@@ -1083,9 +1154,11 @@ bool CPVRManager::PerformChannelSwitch(c
+ 
+     CLog::Log(LOGERROR, "PVRManager - %s - failed to switch to channel '%s'", __FUNCTION__, channel.ChannelName().c_str());
+ 
++    CStdString msg;
++    msg.Format(g_localizeStrings.Get(19035).c_str(), channel.ChannelName().c_str()); // CHANNELNAME could not be played. Check the log for details.
+     CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Error,
+         g_localizeStrings.Get(19166), // PVR information
+-        g_localizeStrings.Get(19035)); // This channel cannot be played. Check the log for details.
++        msg);
+   }
+   else
+   {
+@@ -1323,6 +1396,42 @@ void CPVRManager::ExecutePendingJobs(voi
    m_triggerEvent.Reset();
  }
  
@@ -185,8 +193,6 @@ index 7b98a6b..989b350 100644
  bool CPVRChannelSwitchJob::DoWork(void)
  {
    // announce OnStop and delete m_previous when done
-diff --git a/xbmc/pvr/PVRManager.h b/xbmc/pvr/PVRManager.h
-index abfd59e..43cb555 100644
 --- a/xbmc/pvr/PVRManager.h
 +++ b/xbmc/pvr/PVRManager.h
 @@ -27,6 +27,7 @@
@@ -197,7 +203,7 @@ index abfd59e..43cb555 100644
  
  namespace EPG
  {
-@@ -57,6 +58,13 @@
+@@ -57,6 +58,13 @@ namespace PVR
      ManagerStateStarted
    };
  
@@ -211,7 +217,7 @@ index abfd59e..43cb555 100644
    #define g_PVRManager       CPVRManager::Get()
    #define g_PVRChannelGroups g_PVRManager.ChannelGroups()
    #define g_PVRTimers        g_PVRManager.Timers()
-@@ -389,6 +397,13 @@
+@@ -389,6 +397,13 @@ namespace PVR
      bool StartPlayback(const CPVRChannel *channel, bool bPreview = false);
  
      /*!
@@ -225,7 +231,7 @@ index abfd59e..43cb555 100644
       * @brief Update the current playing file in the guiinfomanager and application.
       */
      void UpdateCurrentFile(void);
-@@ -473,6 +488,13 @@
+@@ -473,6 +488,13 @@ namespace PVR
       */
      bool WaitUntilInitialised(void);
  
@@ -239,31 +245,9 @@ index abfd59e..43cb555 100644
    protected:
      /*!
       * @brief PVR update and control thread.
--- 
-1.7.10
-
-
-From 5cd58075f58ff3afe415acb86f0b460d6f0078fd Mon Sep 17 00:00:00 2001
-From: Franz Koch <franz.koch@elements-net.de>
-Date: Fri, 8 Mar 2013 01:49:03 +0100
-Subject: [PATCH 2/2] [PVR] improve kaitoast error messages on PVR playback
- issues by naming the channel or playbacktype that
- failed
-
----
- language/English/strings.po                  |    2 +-
- xbmc/pvr/PVRManager.cpp                      |    9 +++++++--
- xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp |    4 +++-
- xbmc/pvr/dialogs/GUIDialogPVRGuideInfo.cpp   |    9 ++++++++-
- xbmc/pvr/windows/GUIWindowPVRCommon.cpp      |   13 ++++++++++---
- xbmc/pvr/windows/GUIWindowPVRGuide.cpp       |    6 +++++-
- 6 files changed, 34 insertions(+), 9 deletions(-)
-
-diff --git a/language/English/strings.po b/language/English/strings.po
-index 5b79b46..a4c36f5 100644
 --- a/language/English/strings.po
 +++ b/language/English/strings.po
-@@ -6815,7 +6815,7 @@ msgid "Already started recording on this channel"
+@@ -6506,7 +6506,7 @@ msgid "Already started recording on this
  msgstr ""
  
  msgctxt "#19035"
@@ -272,42 +256,9 @@ index 5b79b46..a4c36f5 100644
  msgstr ""
  
  msgctxt "#19036"
-diff --git a/xbmc/pvr/PVRManager.cpp b/xbmc/pvr/PVRManager.cpp
-index 989b350..a5f3454 100644
---- a/xbmc/pvr/PVRManager.cpp
-+++ b/xbmc/pvr/PVRManager.cpp
-@@ -1082,9 +1082,12 @@ bool CPVRManager::StartPlayback(PlaybackType type /* = PlaybackTypeAny */)
-   if (!bReturn)
-   {
-     CLog::Log(LOGNOTICE, "PVRManager - %s - could not determine %s channel to start playback with. No last played channel found, and first channel of active group could also not be determined.", __FUNCTION__, bIsRadio ? "radio": "tv");
-+
-+    CStdString msg;
-+    msg.Format(g_localizeStrings.Get(19035).c_str(), g_localizeStrings.Get(bIsRadio ? 19021 : 19020).c_str()); // RADIO/TV could not be played. Check the log for details.
-     CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Error,
-             g_localizeStrings.Get(19166), // PVR information
--            g_localizeStrings.Get(19035)); // This channel cannot be played. Check the log for details.
-+            msg);
-   }
- 
-   return bReturn;
-@@ -1151,9 +1154,11 @@ bool CPVRManager::PerformChannelSwitch(const CPVRChannel &channel, bool bPreview
- 
-     CLog::Log(LOGERROR, "PVRManager - %s - failed to switch to channel '%s'", __FUNCTION__, channel.ChannelName().c_str());
- 
-+    CStdString msg;
-+    msg.Format(g_localizeStrings.Get(19035).c_str(), channel.ChannelName().c_str()); // CHANNELNAME could not be played. Check the log for details.
-     CGUIDialogKaiToast::QueueNotification(CGUIDialogKaiToast::Error,
-         g_localizeStrings.Get(19166), // PVR information
--        g_localizeStrings.Get(19035)); // This channel cannot be played. Check the log for details.
-+        msg);
-   }
-   else
-   {
-diff --git a/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp b/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
-index b173d09..67629b9 100644
 --- a/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
 +++ b/xbmc/pvr/dialogs/GUIDialogPVRChannelsOSD.cpp
-@@ -209,9 +209,11 @@ void CGUIDialogPVRChannelsOSD::GotoChannel(int item)
+@@ -209,9 +209,11 @@ void CGUIDialogPVRChannelsOSD::GotoChann
      if (!g_PVRManager.CheckParentalLock(*channel) ||
          !g_application.m_pPlayer->SwitchChannel(*channel))
      {
@@ -320,8 +271,6 @@ index b173d09..67629b9 100644
        return;
      }
    }
-diff --git a/xbmc/pvr/dialogs/GUIDialogPVRGuideInfo.cpp b/xbmc/pvr/dialogs/GUIDialogPVRGuideInfo.cpp
-index f29b556..77645db 100644
 --- a/xbmc/pvr/dialogs/GUIDialogPVRGuideInfo.cpp
 +++ b/xbmc/pvr/dialogs/GUIDialogPVRGuideInfo.cpp
 @@ -23,6 +23,7 @@
@@ -332,7 +281,7 @@ index f29b556..77645db 100644
  
  #include "pvr/PVRManager.h"
  #include "pvr/channels/PVRChannelGroupsContainer.h"
-@@ -170,9 +171,15 @@ bool CGUIDialogPVRGuideInfo::OnClickButtonSwitch(CGUIMessage &message)
+@@ -170,9 +171,15 @@ bool CGUIDialogPVRGuideInfo::OnClickButt
  
      if (!m_progItem->GetEPGInfoTag()->HasPVRChannel() ||
          !g_application.PlayFile(CFileItem(*m_progItem->GetEPGInfoTag()->ChannelTag())))
@@ -349,11 +298,9 @@ index f29b556..77645db 100644
    }
  
    return bReturn;
-diff --git a/xbmc/pvr/windows/GUIWindowPVRCommon.cpp b/xbmc/pvr/windows/GUIWindowPVRCommon.cpp
-index 25e535b..b92e115 100644
 --- a/xbmc/pvr/windows/GUIWindowPVRCommon.cpp
 +++ b/xbmc/pvr/windows/GUIWindowPVRCommon.cpp
-@@ -537,8 +537,9 @@ bool CGUIWindowPVRCommon::ActionPlayEpg(CFileItem *item)
+@@ -537,8 +537,9 @@ bool CGUIWindowPVRCommon::ActionPlayEpg(
  
    if (!bReturn)
    {
@@ -365,7 +312,7 @@ index 25e535b..b92e115 100644
    }
  
    return bReturn;
-@@ -717,9 +718,15 @@ bool CGUIWindowPVRCommon::PlayFile(CFileItem *item, bool bPlayMinimized /* = fal
+@@ -717,9 +718,15 @@ bool CGUIWindowPVRCommon::PlayFile(CFile
  
      if (!bSwitchSuccessful)
      {
@@ -382,11 +329,9 @@ index 25e535b..b92e115 100644
        return false;
      }
    }
-diff --git a/xbmc/pvr/windows/GUIWindowPVRGuide.cpp b/xbmc/pvr/windows/GUIWindowPVRGuide.cpp
-index 02a7027..1167408 100644
 --- a/xbmc/pvr/windows/GUIWindowPVRGuide.cpp
 +++ b/xbmc/pvr/windows/GUIWindowPVRGuide.cpp
-@@ -429,7 +429,11 @@ bool CGUIWindowPVRGuide::PlayEpgItem(CFileItem *item)
+@@ -429,7 +429,11 @@ bool CGUIWindowPVRGuide::PlayEpgItem(CFi
    CLog::Log(LOGDEBUG, "play channel '%s'", channel->ChannelName().c_str());
    bool bReturn = g_application.PlayFile(CFileItem(*channel));
    if (!bReturn)
@@ -399,6 +344,3 @@ index 02a7027..1167408 100644
  
    return bReturn;
  }
--- 
-1.7.10
-
